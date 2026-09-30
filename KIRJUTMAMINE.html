@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kümne sõrme trükkimise harjutus</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #213547;
+      --muted: #64748b;
+      --primary: #2563eb;
+      --good: #16a34a;
+      --bad: #dc2626;
+      --accent: #f59e0b;
+      --key: #e2e8f0;
+      --key-dark: #cbd5e1;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #eef4ff 0%, var(--bg) 100%);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 2rem;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 20px;
+    }
+
+    .panel {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+      align-items: center;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    select, button, input {
+      font: inherit;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      padding: 10px 12px;
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover { opacity: 0.95; }
+
+    .secondary {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .target-box {
+      background: #f8fafc;
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 16px;
+      min-height: 110px;
+    }
+
+    .target-label {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .target-text {
+      font-size: 2rem;
+      line-height: 1.4;
+      letter-spacing: 1px;
+      word-break: break-word;
+    }
+
+    .target-text span.done {
+      color: var(--good);
+    }
+
+    .target-text span.current {
+      background: #fde68a;
+      border-radius: 6px;
+      padding: 2px 4px;
+    }
+
+    .typing-input {
+      width: 100%;
+      font-size: 1.2rem;
+      padding: 14px;
+      border: 2px solid #94a3b8;
+    }
+
+    .typing-input.good {
+      border-color: var(--good);
+    }
+
+    .typing-input.bad {
+      border-color: var(--bad);
+      background: #fef2f2;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .stat {
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 14px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.4rem;
+      margin-top: 6px;
+    }
+
+    .message {
+      min-height: 28px;
+      font-weight: bold;
+      margin-top: 12px;
+    }
+
+    .message.good { color: var(--good); }
+    .message.bad { color: var(--bad); }
+
+    .keyboard {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .keyboard-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: nowrap;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .key {
+      min-width: 42px;
+      height: 46px;
+      padding: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #f1f5f9 0%, #dbe4ef 100%);
+      border: 1px solid #b8c4d3;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 2px 0 rgba(148, 163, 184, 0.35);
+      font-weight: bold;
+      user-select: none;
+      flex: 0 0 auto;
+    }
+
+    .key.active {
+      background: #fde68a;
+      border-color: #f59e0b;
+      transform: translateY(-1px);
+    }
+
+    .key.home {
+      box-shadow: inset 0 -3px 0 rgba(37, 99, 235, 0.35), inset 0 1px 0 rgba(255,255,255,0.7), 0 2px 0 rgba(148, 163, 184, 0.35);
+    }
+
+    .key.home-bump {
+      position: relative;
+    }
+
+    .key.home-bump::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 5px;
+      transform: translateX(-50%);
+      width: 18px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.5);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
+    }
+
+    .key.finger-left-pinky { background: linear-gradient(180deg, #fee2e2 0%, #fecaca 100%); }
+    .key.finger-left-ring { background: linear-gradient(180deg, #ffedd5 0%, #fed7aa 100%); }
+    .key.finger-left-middle { background: linear-gradient(180deg, #fef3c7 0%, #fde68a 100%); }
+    .key.finger-left-index { 
+      background: linear-gradient(180deg, #dcfce7 0%, #bbf7d0 100%);
+      position: relative;
+    }
+    .key.finger-right-index { 
+      background: linear-gradient(180deg, #d1fae5 0%, #a7f3d0 100%);
+      position: relative;
+    }
+
+    .key.finger-left-index::after,
+    .key.finger-right-index::after {
+      content: "☝";
+      position: absolute;
+      right: 4px;
+      top: 2px;
+      font-size: 0.8rem;
+      opacity: 0.75;
+      line-height: 1;
+    }
+    .key.finger-right-middle { background: linear-gradient(180deg, #dbeafe 0%, #bfdbfe 100%); }
+    .key.finger-right-ring { background: linear-gradient(180deg, #ede9fe 0%, #ddd6fe 100%); }
+    .key.finger-right-pinky { background: linear-gradient(180deg, #fce7f3 0%, #fbcfe8 100%); }
+    .key.finger-thumb { background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%); }
+
+    .key.active.finger-left-pinky,
+    .key.active.finger-left-ring,
+    .key.active.finger-left-middle,
+    .key.active.finger-left-index,
+    .key.active.finger-right-index,
+    .key.active.finger-right-middle,
+    .key.active.finger-right-ring,
+    .key.active.finger-right-pinky,
+    .key.active.finger-thumb {
+      outline: 3px solid #f59e0b;
+      outline-offset: 1px;
+    }
+
+    .key.correct {
+      background: #bbf7d0;
+      border-color: #22c55e;
+    }
+
+    .key.medium { min-width: 72px; }
+    .key.wide { min-width: 90px; }
+    .key.xwide { min-width: 110px; }
+    .key.space { min-width: 340px; }
+
+    .keyboard-row:nth-child(2) {
+      padding-left: 18px;
+    }
+
+    .keyboard-row:nth-child(3) {
+      padding-left: 34px;
+    }
+
+    .keyboard-row:nth-child(4) {
+      justify-content: center;
+      padding-left: 0;
+    }
+
+    .finger-guide {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      line-height: 1.5;
+    }
+
+    .home-note {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .hand-map {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .finger-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: #f8fafc;
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .finger-color {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      flex: 0 0 18px;
+      margin-top: 2px;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+    }
+
+    .c-left-pinky { background: #fecaca; }
+    .c-left-ring { background: #fed7aa; }
+    .c-left-middle { background: #fde68a; }
+    .c-left-index { background: #bbf7d0; }
+    .c-right-index { background: #a7f3d0; }
+    .c-right-middle { background: #bfdbfe; }
+    .c-right-ring { background: #ddd6fe; }
+    .c-right-pinky { background: #fbcfe8; }
+    .c-thumb { background: #cbd5e1; }
+
+    .current-finger-box {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+    }
+
+    .current-finger-box strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .index-note {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .home-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      height: 24px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: #2563eb;
+      color: white;
+      font-weight: bold;
+      margin-right: 8px;
+      font-size: 0.9rem;
+    }
+
+    .index-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      height: 24px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: #10b981;
+      color: white;
+      font-weight: bold;
+      margin-right: 8px;
+      font-size: 0.9rem;
+    }
+
+    .lesson-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .lesson-chip {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      padding: 8px 12px;
+      display: inline-block;
+      font-size: 0.95rem;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
+      .key.home-bump::before {
+        width: 14px;
+        height: 3px;
+        bottom: 4px;
+      }
+
+      .key.finger-left-index::after,
+      .key.finger-right-index::after {
+        font-size: 0.7rem;
+        right: 3px;
+        top: 2px;
+      }
+
+      .grid { grid-template-columns: 1fr; }
+      .target-text { font-size: 1.6rem; }
+      .key { min-width: 34px; height: 40px; font-size: 0.9rem; }
+      .key.medium { min-width: 58px; }
+      .key.wide { min-width: 72px; }
+      .key.xwide { min-width: 86px; }
+      .key.space { min-width: 220px; }
+      .keyboard-row:nth-child(2) { padding-left: 10px; }
+      .keyboard-row:nth-child(3) { padding-left: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>Kümne sõrme trükkimise harjutus</h1>
+      <p class="subtitle">
+        Lihtne harjutus lapsele klaviatuuri õppimiseks. Vali tase, kirjuta etteantud tähed või sõnad ja proovi teha seda rahulikult ning õigesti.
+      </p>
+    </section>
+
+    <div class="grid">
+      <section class="panel">
+        <div class="row">
+          <label for="lesson">Harjutus:</label>
+          <select id="lesson"></select>
+          <button id="newBtn">Uus ülesanne</button>
+          <button id="clearBtn" class="secondary">Alusta uuesti</button>
+        </div>
+
+        <div class="target-box">
+          <div class="target-label">Kirjuta see tekst:</div>
+          <div id="targetText" class="target-text"></div>
+        </div>
+
+        <input
+          id="typingInput"
+          class="typing-input"
+          type="text"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+          placeholder="Kirjuta siia..."
+        />
+
+        <div id="message" class="message"></div>
+
+        <div class="stats">
+          <div class="stat">Õigeid tähti<strong id="correctCount">0</strong></div>
+          <div class="stat">Vigu<strong id="errorCount">0</strong></div>
+          <div class="stat">Valmis ülesandeid<strong id="finishedCount">0</strong></div>
+          <div class="stat">Täpsus<strong id="accuracy">100%</strong></div>
+        </div>
+
+        <div class="keyboard" id="keyboard"></div>
+
+        <div class="current-finger-box">
+          <strong>Soovitatud sõrm:</strong>
+          <div id="currentFingerHint">Vajuta esimest tähte ja vaata vihjet.</div>
+        </div>
+
+        <div class="home-note">
+          <span class="home-badge">FJ</span>
+          <b>F</b> ja <b>J</b> on stardiklahvid. Päris klaviatuuril on neil väike <b>kühm</b>, et sõrmed leiaksid õige asendi ka ilma alla vaatamata.
+        </div>
+
+        <div class="index-note">
+          <span class="index-badge">☝</span>
+          Rohekamad klahvid ja väikese <b>☝</b> märgiga klahvid on <b>nimetissõrme klahvid</b>.
+        </div>
+      </section>
+
+      <aside class="panel">
+        <h2 style="margin-top:0;">Õppimise juhend</h2>
+        <div class="finger-guide">
+          <strong>Alusta kodureast:</strong><br />
+          vasak käsi: <b>a s d f</b><br />
+          parem käsi: <b>j k l ö</b><br />
+          pöidlad: <b>tühik</b><br /><br />
+          Hoia nimetissõrmed <b>f</b> ja <b>j</b> peal. Need on koduklahvid, kuhu sõrmed lähevad tagasi. Nendel klahvidel on ka väike reljeefne kühm.
+        </div>
+
+        <div class="hand-map">
+          <div class="finger-item"><span class="finger-color c-left-pinky"></span><div><strong>Vasak väike sõrm</strong><br />q, a, z</div></div>
+          <div class="finger-item"><span class="finger-color c-left-ring"></span><div><strong>Vasak nimeta sõrm</strong><br />w, s, x</div></div>
+          <div class="finger-item"><span class="finger-color c-left-middle"></span><div><strong>Vasak keskmine sõrm</strong><br />e, d, c</div></div>
+          <div class="finger-item"><span class="finger-color c-left-index"></span><div><strong>Vasak nimetissõrm ☝</strong><br />r, t, f, g, v, b</div></div>
+          <div class="finger-item"><span class="finger-color c-right-index"></span><div><strong>Parem nimetissõrm ☝</strong><br />y, u, h, j, n, m</div></div>
+          <div class="finger-item"><span class="finger-color c-right-middle"></span><div><strong>Parem keskmine sõrm</strong><br />i, k, ,</div></div>
+          <div class="finger-item"><span class="finger-color c-right-ring"></span><div><strong>Parem nimeta sõrm</strong><br />o, l, .</div></div>
+          <div class="finger-item"><span class="finger-color c-right-pinky"></span><div><strong>Parem väike sõrm</strong><br />p, ü, õ, ö, ä, -, Enter, Backspace</div></div>
+          <div class="finger-item"><span class="finger-color c-thumb"></span><div><strong>Pöial</strong><br />tühik</div></div>
+        </div>
+
+        <div class="lesson-list">
+          <span class="lesson-chip">1. Tähed kodureal</span>
+          <span class="lesson-chip">2. Lihtsad tähepaarid</span>
+          <span class="lesson-chip">3. Lühikesed sõnad</span>
+          <span class="lesson-chip">4. Pikemad sõnad</span>
+        </div>
+
+        <p class="footer-note">
+          Nipp: alguses ei ole tähtis kiirus. Tähtis on see, et laps vajutaks õiged klahvid ja harjuks sõrmede asendiga.
+        </p>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const lessons = {
+      "Kodurida": [
+        "asdf", "jklö", "asdf jklö", "sall", "kass", "lada", "sada", "jala", "lõks", "dada"
+      ],
+      "Tähepaarid": [
+        "sa sa sa", "la la la", "ja ja ja", "as as as", "kl kl kl", "sada", "jala", "kala", "lass", "jalad"
+      ],
+      "Lihtsad sõnad": [
+        "ema", "isa", "kala", "sai", "laud", "jalg", "sall", "kool", "auto", "laps"
+      ],
+      "Pikemad sõnad": [
+        "klaviatuur", "harjutamine", "õppimine", "trükkimine", "sõrmed", "tähed", "rahulikult", "tubli laps"
+      ]
+    };
+
+    const keyboardRows = [
+      [
+        { key: "q", finger: "left-pinky" }, { key: "w", finger: "left-ring" }, { key: "e", finger: "left-middle" },
+        { key: "r", finger: "left-index" }, { key: "t", finger: "left-index" }, { key: "y", finger: "right-index" },
+        { key: "u", finger: "right-index" }, { key: "i", finger: "right-middle" }, { key: "o", finger: "right-ring" },
+        { key: "p", finger: "right-pinky" }, { key: "ü", finger: "right-pinky" }, { key: "õ", finger: "right-pinky" },
+        { key: "backspace", label: "⌫", width: "wide", finger: "right-pinky" }
+      ],
+      [
+        { key: "tab", label: "Tab", width: "medium", finger: "left-pinky" },
+        { key: "a", finger: "left-pinky", home: true }, { key: "s", finger: "left-ring", home: true },
+        { key: "d", finger: "left-middle", home: true }, { key: "f", finger: "left-index", home: true, bump: true },
+        { key: "g", finger: "left-index" }, { key: "h", finger: "right-index" }, { key: "j", finger: "right-index", home: true, bump: true },
+        { key: "k", finger: "right-middle", home: true }, { key: "l", finger: "right-ring", home: true },
+        { key: "ö", finger: "right-pinky", home: true }, { key: "ä", finger: "right-pinky" },
+        { key: "enter", label: "Enter", width: "wide", finger: "right-pinky" }
+      ],
+      [
+        { key: "shift", label: "Shift", width: "xwide", finger: "left-pinky" },
+        { key: "z", finger: "left-pinky" }, { key: "x", finger: "left-ring" }, { key: "c", finger: "left-middle" },
+        { key: "v", finger: "left-index" }, { key: "b", finger: "left-index" }, { key: "n", finger: "right-index" },
+        { key: "m", finger: "right-index" }, { key: ",", finger: "right-middle" }, { key: ".", finger: "right-ring" },
+        { key: "-", finger: "right-pinky" },
+        { key: "shift-right", label: "Shift", width: "xwide", finger: "right-pinky" }
+      ],
+      [
+        { key: "space", label: "Tühik", width: "space", finger: "thumb" }
+      ]
+    ];
+
+    const lessonSelect = document.getElementById("lesson");
+    const newBtn = document.getElementById("newBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const targetTextEl = document.getElementById("targetText");
+    const typingInput = document.getElementById("typingInput");
+    const messageEl = document.getElementById("message");
+    const correctCountEl = document.getElementById("correctCount");
+    const errorCountEl = document.getElementById("errorCount");
+    const finishedCountEl = document.getElementById("finishedCount");
+    const accuracyEl = document.getElementById("accuracy");
+    const keyboardEl = document.getElementById("keyboard");
+    const currentFingerHintEl = document.getElementById("currentFingerHint");
+
+    const fingerNames = {
+      "left-pinky": "vasak väike sõrm",
+      "left-ring": "vasak nimeta sõrm",
+      "left-middle": "vasak keskmine sõrm",
+      "left-index": "vasak nimetissõrm",
+      "right-index": "parem nimetissõrm",
+      "right-middle": "parem keskmine sõrm",
+      "right-ring": "parem nimeta sõrm",
+      "right-pinky": "parem väike sõrm",
+      "thumb": "pöial"
+    };
+
+    let currentTarget = "";
+    let correctCount = 0;
+    let errorCount = 0;
+    let finishedCount = 0;
+
+    function buildLessonOptions() {
+      Object.keys(lessons).forEach(name => {
+        const opt = document.createElement("option");
+        opt.value = name;
+        opt.textContent = name;
+        lessonSelect.appendChild(opt);
+      });
+    }
+
+    function buildKeyboard() {
+      keyboardEl.innerHTML = "";
+      keyboardRows.forEach(row => {
+        const rowEl = document.createElement("div");
+        rowEl.className = "keyboard-row";
+
+        row.forEach(item => {
+          const keyEl = document.createElement("div");
+          const fingerClass = item.finger ? ` finger-${item.finger}` : "";
+          const homeClass = item.home ? " home" : "";
+          const bumpClass = item.bump ? " home-bump" : "";
+          keyEl.className = "key" + (item.width ? ` ${item.width}` : "") + fingerClass + homeClass + bumpClass;
+          keyEl.dataset.key = item.key;
+          if (item.finger) keyEl.dataset.finger = item.finger;
+          keyEl.textContent = item.label || item.key;
+          rowEl.appendChild(keyEl);
+        });
+
+        keyboardEl.appendChild(rowEl);
+      });
+    }
+
+    function pickNewTarget() {
+      const selectedLesson = lessonSelect.value;
+      const options = lessons[selectedLesson];
+      currentTarget = options[Math.floor(Math.random() * options.length)];
+      typingInput.value = "";
+      typingInput.classList.remove("good", "bad");
+      setMessage("Alusta kirjutamist!", "");
+      currentFingerHintEl.textContent = "Vaata, milline klahv on esile tõstetud.";
+      renderTarget();
+      highlightNextKey();
+      typingInput.focus();
+    }
+
+    function renderTarget() {
+      const typed = typingInput.value;
+      let html = "";
+
+      for (let i = 0; i < currentTarget.length; i++) {
+        const char = currentTarget[i];
+        if (i < typed.length) {
+          html += `<span class="done">${escapeHtml(char)}</span>`;
+        } else if (i === typed.length) {
+          html += `<span class="current">${escapeHtml(char)}</span>`;
+        } else {
+          html += `<span>${escapeHtml(char)}</span>`;
+        }
+      }
+
+      targetTextEl.innerHTML = html;
+    }
+
+    function setMessage(text, type) {
+      messageEl.textContent = text;
+      messageEl.className = "message" + (type ? ` ${type}` : "");
+    }
+
+    function updateStats() {
+      correctCountEl.textContent = correctCount;
+      errorCountEl.textContent = errorCount;
+      finishedCountEl.textContent = finishedCount;
+      const total = correctCount + errorCount;
+      const accuracy = total === 0 ? 100 : Math.round((correctCount / total) * 100);
+      accuracyEl.textContent = accuracy + "%";
+    }
+
+    function clearKeyHighlights() {
+      document.querySelectorAll(".key").forEach(key => {
+        key.classList.remove("active", "correct");
+      });
+    }
+
+    function normalizeKey(key) {
+      if (!key) return "";
+      return key.toLowerCase();
+    }
+
+    function highlightNextKey() {
+      clearKeyHighlights();
+      const nextChar = normalizeKey(currentTarget[typingInput.value.length]);
+      if (!nextChar) {
+        currentFingerHintEl.textContent = "Ülesanne valmis. Väga tubli!";
+        return;
+      }
+      const lookupKey = nextChar === " " ? "space" : nextChar;
+      const keyEl = document.querySelector(`.key[data-key="${CSS.escape(lookupKey)}"]`);
+      if (keyEl) {
+        keyEl.classList.add("active");
+        const finger = keyEl.dataset.finger;
+        const fingerName = fingerNames[finger] || "sobiv sõrm";
+        const keyName = nextChar === " " ? "tühik" : nextChar;
+        const bumpText = (lookupKey === "f" || lookupKey === "j") ? " See on stardiklahv väikese kühmuga." : "";
+        currentFingerHintEl.textContent = `Järgmine klahv "${keyName}" — kasuta ${fingerName}.${bumpText}`;
+      } else {
+        currentFingerHintEl.textContent = `Järgmine klahv: ${nextChar}`;
+      }
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", "&#039;")
+        .replaceAll(" ", "&nbsp;");
+    }
+
+    typingInput.addEventListener("input", () => {
+      const typed = typingInput.value;
+      const expected = currentTarget.slice(0, typed.length);
+
+      if (typed === expected) {
+        typingInput.classList.add("good");
+        typingInput.classList.remove("bad");
+        correctCount++;
+        setMessage("Tubli! Jätka samas vaimus.", "good");
+      } else {
+        typingInput.classList.add("bad");
+        typingInput.classList.remove("good");
+        errorCount++;
+        setMessage("Ups, vaata järgmine täht rahulikult üle.", "bad");
+      }
+
+      renderTarget();
+      highlightNextKey();
+      updateStats();
+
+      if (typed === currentTarget) {
+        finishedCount++;
+        typingInput.classList.remove("bad");
+        typingInput.classList.add("good");
+        setMessage("Väga tubli! Said ülesande valmis.", "good");
+        updateStats();
+        clearKeyHighlights();
+        setTimeout(pickNewTarget, 900);
+      }
+    });
+
+    typingInput.addEventListener("keydown", (e) => {
+      const pressed = normalizeKey(e.key);
+      const lookupKey = pressed === " " ? "space" : pressed;
+      if (lookupKey.length >= 1) {
+        const keyEl = document.querySelector(`.key[data-key="${CSS.escape(lookupKey)}"]`);
+        if (keyEl) {
+          keyEl.classList.add("correct");
+          setTimeout(() => keyEl.classList.remove("correct"), 180);
+        }
+      }
+    });
+
+    newBtn.addEventListener("click", pickNewTarget);
+
+    clearBtn.addEventListener("click", () => {
+      typingInput.value = "";
+      typingInput.classList.remove("good", "bad");
+      renderTarget();
+      highlightNextKey();
+      setMessage("Alustame uuesti.", "");
+      currentFingerHintEl.textContent = "Vaata, milline klahv on esile tõstetud.";
+      typingInput.focus();
+    });
+
+    lessonSelect.addEventListener("change", pickNewTarget);
+
+    buildLessonOptions();
+    buildKeyboard();
+    lessonSelect.selectedIndex = 0;
+    updateStats();
+    pickNewTarget();
+  </script>
+</body>
+</html>
+
